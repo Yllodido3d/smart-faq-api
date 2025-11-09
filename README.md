@@ -1,29 +1,118 @@
-# 🧠 Respostas Prontas BR
+# 💬 ReadyAnswers API
 
-API de respostas automáticas com correspondência de texto em português usando Fuzzy Matching.
+A simple **FastAPI-based REST API** that provides quick pre-defined answers for common questions — ideal for bots, prototypes, or internal tools.  
+This version replaces the original Portuguese database and endpoints with English ones.
 
-## 🚀 Endpoints Principais
+---
 
-| Método | Rota | Descrição |
-|--------|------|------------|
-| POST | `/responder` | Retorna a resposta mais similar à pergunta enviada |
-| GET | `/categorias` | Lista todas as categorias existentes |
-| GET | `/perguntas/{cat}` | Lista perguntas de uma categoria |
-| POST | `/add` | Adiciona uma nova pergunta/resposta |
-| POST | `/importar_csv` | Importa perguntas via arquivo CSV |
-| GET | `/status` | Mostra uptime, total de respostas e versão |
+## 🚀 Features
 
-## 🔑 Autenticação
+- 🔑 Simple API key authentication  
+- 💡 Fuzzy search for best matching answers (using RapidFuzz)  
+- 📦 Import and store Q&A data in SQLite  
+- 📊 Daily usage limit per IP  
+- 📁 CSV import support  
+- ⚙️ FastAPI + Uvicorn stack for easy deployment  
 
-Todas as rotas (exceto `/status`) exigem uma **API Key**:
-```bash
+---
+
+## 🧠 Endpoints Overview
+
+| Method | Endpoint | Description |
+|--------|-----------|-------------|
+| `POST` | `/answer` | Returns the best-matching answer for a question |
+| `GET`  | `/categories` | Lists all categories available |
+| `GET`  | `/questions/{category}` | Lists all questions from a category |
+| `POST` | `/add` | Add a new question/answer pair manually |
+| `POST` | `/import_csv` | Import multiple Q&A entries via CSV |
+| `GET`  | `/status` | API status and uptime |
+
+---
+
+## 🔒 Authentication
+
+Every request must include an API key:
 ?api_key=123abc
-```
 
-## 💡 Exemplo de Uso
-```bash
-curl -X POST "https://teu-render-url.onrender.com/responder?api_key=123abc"      -H "Content-Type: application/json"      -d '{"pergunta": "qual seu nome?"}'
-```
 
-## 📦 Deploy
-O projeto está pronto para deploy no [Render.com](https://render.com) e integração com o [RapidAPI](https://rapidapi.com).
+(Default key can be changed in the environment variable `API_KEY`.)
+
+Example:
+
+
+POST /answer?api_key=123abc
+
+
+---
+
+## 🧩 Database
+
+SQLite database file: `answers.db`  
+Schema:
+
+| Column | Type | Description |
+|--------|------|-------------|
+| id | INTEGER | Auto increment |
+| question | TEXT | User question |
+| answer | TEXT | Stored response |
+| category | TEXT | Optional category |
+
+---
+
+## 📥 CSV Import Format
+
+To bulk import data, upload a `.csv` file with the following format:
+
+```csv
+question,answer,category
+"What is FastAPI?","FastAPI is a modern, fast web framework for Python.","Python"
+"How to install it?","Use pip install fastapi uvicorn.","Python"
+
+
+Then use the /import_csv endpoint.
+
+⚡ Deployment
+
+Example render.yaml for Render.com:
+
+services:
+  - type: web
+    name: readyanswers-api
+    env: python
+    buildCommand: ""
+    startCommand: uvicorn main:app --host 0.0.0.0 --port 10000
+    plan: free
+    autoDeploy: true
+
+requirements.txt
+fastapi
+uvicorn
+pydantic
+python-multipart
+rapidfuzz
+unidecode
+
+🧪 Test Locally
+uvicorn main:app --reload
+
+
+Then open:
+👉 http://127.0.0.1:8000/docs
+
+🧰 Example Request
+curl -X POST "https://readyanswers-api.onrender.com/answer?api_key=123abc" \
+     -H "Content-Type: application/json" \
+     -d '{"question": "What is FastAPI?"}'
+
+
+Response:
+
+{
+  "answer": "FastAPI is a modern, fast web framework for Python.",
+  "confidence": "97.2%"
+}
+
+🧙‍♂️ About
+
+Originally created for Portuguese users as “Respostas Prontas BR”,
+now rebuilt for global usage with English dataset and structure.
