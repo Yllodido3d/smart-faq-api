@@ -1,0 +1,97 @@
+question,answer,category
+What is your refund policy?,Refunds are available within 14 days of purchase.,Payments
+How can I reset my password?,You can reset it using the “Forgot Password” option on the login page.,Account
+Where can I track my order?,You can track it in your profile under the “Orders” section.,Orders
+Do you offer customer support?,Yes, support is available 24/7 via chat or email.,Support
+Can I change my email address?,Yes, go to your profile settings to update your email.,Account
+How do I cancel my subscription?,You can cancel anytime from your billing page.,Payments
+Do you have a mobile app?,Yes, it’s available for Android and iOS.,General
+How long does shipping take?,Shipping takes 3–7 business days depending on your region.,Orders
+Is my data secure?,Yes, we use encryption and follow strict privacy standards.,Security
+What payment methods do you accept?,We accept credit cards, PayPal, and bank transfers.,Payments
+Can I delete my account?,Yes, request deletion in your account settings.,Account
+Do you offer discounts?,Yes, check our promotions page for current offers.,Payments
+How can I contact support?,You can contact support via email or live chat.,Support
+Where are you located?,Our headquarters are in New York, USA.,General
+Do you ship internationally?,Yes, we ship to over 50 countries worldwide.,Orders
+Can I return a product?,Yes, you can return within 30 days if unused.,Orders
+When will my refund arrive?,Refunds are processed within 5–10 business days.,Payments
+Can I upgrade my plan?,Yes, you can upgrade anytime from the dashboard.,Account
+Do I need an account to buy?,Yes, creating an account is required to make purchases.,Account
+What browsers are supported?,We support Chrome, Firefox, Safari, and Edge.,General
+Can I download an invoice?,Yes, invoices are available in your billing history.,Payments
+What languages are supported?,Currently, English and Spanish are supported.,General
+Can I change my password?,Yes, you can change it anytime in account settings.,Account
+Is there a free trial?,Yes, we offer a 7-day free trial for all new users.,Payments
+How do I verify my email?,Check your inbox for a verification link after signup.,Account
+Do you have student discounts?,Yes, contact support with proof of enrollment.,Payments
+Can I pause my subscription?,Yes, subscriptions can be paused for up to 3 months.,Payments
+What happens after trial ends?,You’ll be automatically moved to the basic plan.,Payments
+Do you store my credit card?,No, payment data is handled by a secure provider.,Security
+Can I use multiple devices?,Yes, you can log in from multiple devices.,General
+How can I update my billing info?,Update billing details in your billing settings.,Payments
+Do you offer API access?,Yes, API access is available for premium users.,Developers
+Where can I read your privacy policy?,It’s available at the bottom of our website.,Security
+How often do you update?,We release updates every two weeks.,General
+Can I use the service offline?,No, an internet connection is required.,General
+What is your uptime guarantee?,We guarantee 99.9% uptime.,Developers
+Do you support dark mode?,Yes, dark mode can be enabled in settings.,General
+Can I suggest new features?,Yes, you can submit ideas via our feedback form.,General
+Is there a setup fee?,No, there are no setup fees.,Payments
+Can I recover deleted data?,Unfortunately, deleted data cannot be recovered.,Security
+Is there a limit on usage?,Yes, free users have daily limits.,Payments
+Can I integrate with Zapier?,Yes, Zapier integration is available.,Developers
+Do you offer team plans?,Yes, team plans are available under subscriptions.,Payments
+Is VAT included in pricing?,VAT is included where applicable.,Payments
+Can I use it for commercial purposes?,Yes, commercial use is allowed.,General
+How do I enable notifications?,You can enable them in settings.,Account
+Can I invite teammates?,Yes, invite teammates from your dashboard.,Account
+Is my progress saved automatically?,Yes, your data saves automatically.,General
+Do you provide analytics?,Yes, analytics are available for paid users.,Developers
+How do I delete my data?,Request deletion from account settings.,Security
+Can I export my data?,Yes, data export is available in your profile.,Security
+Do you support two-factor authentication?,Yes, enable 2FA in the security section.,Security
+Is there phone support?,No, we currently offer chat and email support only.,Support
+How do I change my username?,Usernames can be changed in profile settings.,Account
+Do you offer lifetime plans?,No, we only offer monthly and yearly plans.,Payments
+Can I share my account?,No, account sharing is not allowed.,Security
+Is there an affiliate program?,Yes, details are on our affiliate page.,General
+Can I use custom branding?,Yes, available in business plans.,Developers
+Do you offer API documentation?,Yes, full API docs are available on our site.,Developers
+What’s the file upload limit?,The maximum upload size is 25MB.,General
+Can I use my own domain?,Yes, available in enterprise plans.,Developers
+What timezone are you in?,We operate in UTC.,General
+How can I stop receiving emails?,You can unsubscribe in your email settings.,Account
+Do you have a roadmap?,Yes, our roadmap is public on our website.,General
+Can I test without paying?,Yes, with the free trial or sandbox mode.,Payments
+Do you offer custom integrations?,Yes, contact us for enterprise options.,Developers
+What’s your SLA?,We provide 99.9% service-level agreement.,Developers
+Can I schedule tasks?,Yes, available in pro and business plans.,Developers
+Do you offer backups?,Yes, backups are created daily.,Security
+Can I remove branding?,Yes, on premium and enterprise plans.,Developers
+Do you offer training?,Yes, training materials are included in all plans.,Support
+What happens if payment fails?,You’ll be notified and your account will be paused.,Payments
+Can I merge accounts?,No, merging accounts isn’t supported.,Account
+Do you provide certificates?,Yes, on completion of verified courses.,General
+How do I report a bug?,Report it via our feedback or contact form.,Support
+Is there a changelog?,Yes, it’s available on our website.,Developers
+Can I use emojis?,Yes, emojis are supported in most fields.,General
+Do you have uptime status page?,Yes, visit status.yourdomain.com.,Developers
+Can I customize notifications?,Yes, available in account settings.,Account
+Is there an API key limit?,Yes, each account can have 3 active keys.,Developers
+Do you support SSO?,Yes, SSO is available for enterprise plans.,Security
+Do you support Webhooks?,Yes, webhooks are available for developers.,Developers
+Can I delete a workspace?,Yes, from workspace settings.,Account
+Do you support CSV import?,Yes, import CSV files from your dashboard.,Developers
+Can I lock my account?,Yes, temporarily from security settings.,Security
+Do you offer early access?,Yes, available for beta testers.,General
+What is your mission?,To make automation easy for everyone.,General
+Do you have office hours?,Yes, Monday to Friday, 9 AM to 6 PM.,Support
+Can I get a demo?,Yes, book a demo from our website.,Support
+Do you offer API examples?,Yes, examples are in the documentation.,Developers
+How often are backups created?,Backups are generated daily.,Security
+Do you support multiple languages?,Yes, more languages are coming soon.,General
+Can I contact sales?,Yes, email sales@yourdomain.com.,Support
+Do you support Markdown?,Yes, Markdown is supported in text fields.,Developers
+Can I get notified of updates?,Yes, enable release notifications.,General
+Is there a way to test the API?,Yes, you can test it directly from the docs.,Developers
