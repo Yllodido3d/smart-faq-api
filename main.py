@@ -8,203 +8,214 @@ from unidecode import unidecode
 import time
 from datetime import datetime
 
-app = FastAPI(title="Respostas Prontas BR")
+app = FastAPI(title="Auto Answer API")
 
 # ======================
-# 1. Autenticação simples
+# 1. Simple Authentication
 # ======================
 API_KEY = os.getenv("API_KEY", "123abc")
 
 
-def validar_api_key(chave: str):
-    if chave != API_KEY:
-        raise HTTPException(status_code=401, detail="API key inválida.")
+def validate_api_key(key: str):
+    if key != API_KEY:
+        raise HTTPException(status_code=401, detail="Invalid API key.")
 
 
 # ======================
-# 2. Estrutura do banco
+# 2. Database Structure
 # ======================
-def inicializar_banco():
-    conn = sqlite3.connect("respostas.db")
+def init_database():
+    conn = sqlite3.connect("answers.db")
     cur = conn.cursor()
     cur.execute("""
-        CREATE TABLE IF NOT EXISTS respostas (
+        CREATE TABLE IF NOT EXISTS answers (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            pergunta TEXT,
-            resposta TEXT,
-            categoria TEXT
+            question TEXT,
+            answer TEXT,
+            category TEXT
         )
     """)
-    # Tabela pra controle de uso diário
+    # Table for daily usage control
     cur.execute("""
-        CREATE TABLE IF NOT EXISTS uso_api (
+        CREATE TABLE IF NOT EXISTS api_usage (
             ip TEXT,
-            data TEXT,
-            contador INTEGER,
-            PRIMARY KEY (ip, data)
+            date TEXT,
+            counter INTEGER,
+            PRIMARY KEY (ip, date)
         )
     """)
     conn.commit()
     conn.close()
 
 
-inicializar_banco()
+init_database()
 start_time = time.time()
 
 
 # ======================
-# 3. Modelos Pydantic
+# 3. Pydantic Models
 # ======================
-class Pergunta(BaseModel):
-    pergunta: str
+class Question(BaseModel):
+    question: str
 
 
-class NovaResposta(BaseModel):
-    pergunta: str
-    resposta: str
-    categoria: str | None = None
+class NewAnswer(BaseModel):
+    question: str
+    answer: str
+    category: str | None = None
 
 
 # ======================
-# 4. Controle de uso diário
+# 4. Daily Usage Control
 # ======================
-LIMITE_DIARIO = 20
+DAILY_LIMIT = 20
 
 
-def verificar_limite(ip: str):
-    hoje = datetime.now().strftime("%Y-%m-%d")
-    conn = sqlite3.connect("respostas.db")
+def check_usage_limit(ip: str):
+    today = datetime.now().strftime("%Y-%m-%d")
+    conn = sqlite3.connect("answers.db")
     cur = conn.cursor()
 
-    cur.execute("SELECT contador FROM uso_api WHERE ip=? AND data=?", (ip, hoje))
+    cur.execute(
+        "SELECT counter FROM api_usage WHERE ip=? AND date=?", (ip, today))
     row = cur.fetchone()
 
     if row:
-        contador = row[0]
-        if contador >= LIMITE_DIARIO:
+        counter = row[0]
+        if counter >= DAILY_LIMIT:
             conn.close()
-            raise HTTPException(status_code=429, detail="Limite diário de uso atingido (20 requisições por dia).")
-        cur.execute("UPDATE uso_api SET contador=contador+1 WHERE ip=? AND data=?", (ip, hoje))
+            raise HTTPException(
+                status_code=429, detail="Daily usage limit reached (20 requests per day)."
+            )
+        cur.execute(
+            "UPDATE api_usage SET counter=counter+1 WHERE ip=? AND date=?", (
+                ip, today)
+        )
     else:
-        cur.execute("INSERT INTO uso_api (ip, data, contador) VALUES (?, ?, ?)", (ip, hoje, 1))
+        cur.execute(
+            "INSERT INTO api_usage (ip, date, counter) VALUES (?, ?, ?)", (ip, today, 1)
+        )
 
     conn.commit()
     conn.close()
 
 
 # ======================
-# 5. Endpoint principal
+# 5. Main Endpoint
 # ======================
-@app.post("/responder")
-async def responder(pergunta: Pergunta, request: Request, api_key: str = Query(...)):
-    validar_api_key(api_key)
-    ip_cliente = request.client.host
-    verificar_limite(ip_cliente)
+@app.post("/answer")
+async def answer_question(q: Question, request: Request, api_key: str = Query(...)):
+    validate_api_key(api_key)
+    client_ip = request.client.host
+    check_usage_limit(client_ip)
 
-    conn = sqlite3.connect("respostas.db")
+    conn = sqlite3.connect("answers.db")
     cur = conn.cursor()
-    cur.execute("SELECT pergunta, resposta FROM respostas")
-    todas = cur.fetchall()
+    cur.execute("SELECT question, answer FROM answers")
+    all_data = cur.fetchall()
     conn.close()
 
-    if not todas:
-        return {"erro": "banco vazio"}
+    if not all_data:
+        return {"error": "empty database"}
 
-    perguntas_db = [unidecode(p.lower()) for p, _ in todas]
-    entrada = unidecode(pergunta.pergunta.lower())
+    db_questions = [unidecode(q.lower()) for q, _ in all_data]
+    input_q = unidecode(q.question.lower())
 
-    match, score, idx = process.extractOne(entrada, perguntas_db, scorer=fuzz.ratio)
+    match, score, idx = process.extractOne(
+        input_q, db_questions, scorer=fuzz.ratio)
     if score >= 70:
-        resposta = todas[idx][1]
-        return {"resposta": resposta, "confiança": f"{score:.1f}%"}
+        response = all_data[idx][1]
+        return {"answer": response, "confidence": f"{score:.1f}%"}
 
-    return {"erro": "não sei"}
-
-
-# ======================
-# 6. Endpoint de listagem
-# ======================
-@app.get("/categorias")
-async def listar_categorias(api_key: str = Query(...)):
-    validar_api_key(api_key)
-    conn = sqlite3.connect("respostas.db")
-    cur = conn.cursor()
-    cur.execute("SELECT DISTINCT categoria FROM respostas WHERE categoria IS NOT NULL")
-    categorias = [row[0] for row in cur.fetchall()]
-    conn.close()
-    return {"categorias": categorias}
-
-
-@app.get("/perguntas/{cat}")
-async def listar_perguntas(cat: str, api_key: str = Query(...)):
-    validar_api_key(api_key)
-    conn = sqlite3.connect("respostas.db")
-    cur = conn.cursor()
-    cur.execute("SELECT pergunta FROM respostas WHERE categoria=?", (cat,))
-    perguntas = [row[0] for row in cur.fetchall()]
-    conn.close()
-    return {"categoria": cat, "perguntas": perguntas}
+    return {"error": "I don't know"}
 
 
 # ======================
-# 7. Adicionar manualmente
+# 6. Listing Endpoints
 # ======================
-@app.post("/add")
-async def adicionar_resposta(item: NovaResposta, api_key: str = Query(...)):
-    validar_api_key(api_key)
-    conn = sqlite3.connect("respostas.db")
+@app.get("/categories")
+async def list_categories(api_key: str = Query(...)):
+    validate_api_key(api_key)
+    conn = sqlite3.connect("answers.db")
     cur = conn.cursor()
     cur.execute(
-        "INSERT INTO respostas (pergunta, resposta, categoria) VALUES (?, ?, ?)",
-        (item.pergunta, item.resposta, item.categoria)
+        "SELECT DISTINCT category FROM answers WHERE category IS NOT NULL"
+    )
+    categories = [row[0] for row in cur.fetchall()]
+    conn.close()
+    return {"categories": categories}
+
+
+@app.get("/questions/{cat}")
+async def list_questions(cat: str, api_key: str = Query(...)):
+    validate_api_key(api_key)
+    conn = sqlite3.connect("answers.db")
+    cur = conn.cursor()
+    cur.execute("SELECT question FROM answers WHERE category=?", (cat,))
+    questions = [row[0] for row in cur.fetchall()]
+    conn.close()
+    return {"category": cat, "questions": questions}
+
+
+# ======================
+# 7. Add Manually
+# ======================
+@app.post("/add")
+async def add_answer(item: NewAnswer, api_key: str = Query(...)):
+    validate_api_key(api_key)
+    conn = sqlite3.connect("answers.db")
+    cur = conn.cursor()
+    cur.execute(
+        "INSERT INTO answers (question, answer, category) VALUES (?, ?, ?)",
+        (item.question, item.answer, item.category)
     )
     conn.commit()
     conn.close()
-    return {"status": "ok", "adicionado": item}
+    return {"status": "ok", "added": item}
 
 
 # ======================
-# 8. Importar CSV
+# 8. Import from CSV
 # ======================
-@app.post("/importar_csv")
-async def importar_csv(arquivo: UploadFile, api_key: str = Query(...)):
-    validar_api_key(api_key)
-    conteudo = await arquivo.read()
-    linhas = conteudo.decode("utf-8").splitlines()
-    leitor = csv.reader(linhas)
+@app.post("/import_csv")
+async def import_csv(file: UploadFile, api_key: str = Query(...)):
+    validate_api_key(api_key)
+    content = await file.read()
+    lines = content.decode("utf-8").splitlines()
+    reader = csv.reader(lines)
 
-    conn = sqlite3.connect("respostas.db")
+    conn = sqlite3.connect("answers.db")
     cur = conn.cursor()
     count = 0
-    for linha in leitor:
-        if len(linha) >= 2:
-            pergunta, resposta, *categoria = linha
-            cat = categoria[0] if categoria else None
+    for line in reader:
+        if len(line) >= 2:
+            question, answer, *category = line
+            cat = category[0] if category else None
             cur.execute(
-                "INSERT INTO respostas (pergunta, resposta, categoria) VALUES (?, ?, ?)",
-                (pergunta.strip(), resposta.strip(), cat)
+                "INSERT INTO answers (question, answer, category) VALUES (?, ?, ?)",
+                (question.strip(), answer.strip(), cat)
             )
             count += 1
     conn.commit()
     conn.close()
-    return {"status": "ok", "adicionados": count}
+    return {"status": "ok", "added": count}
 
 
 # ======================
-# 9. Status da API
+# 9. API Status
 # ======================
 @app.get("/status")
 async def status():
     uptime = round(time.time() - start_time, 1)
-    conn = sqlite3.connect("respostas.db")
+    conn = sqlite3.connect("answers.db")
     cur = conn.cursor()
-    cur.execute("SELECT COUNT(*) FROM respostas")
+    cur.execute("SELECT COUNT(*) FROM answers")
     total = cur.fetchone()[0]
     conn.close()
 
     return {
         "status": "online",
-        "versao": "1.2",
-        "total_respostas": total,
-        "uptime_segundos": uptime
+        "version": "1.2",
+        "total_answers": total,
+        "uptime_seconds": uptime
     }
