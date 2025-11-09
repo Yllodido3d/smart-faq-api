@@ -205,7 +205,10 @@ async def import_csv(file: UploadFile, api_key: str = Query(...)):
 # 9. API Status
 # ======================
 @app.get("/status")
-async def status():
+async def status(api_key: str = Query(None)):  # ← ADICIONE = None
+    if api_key is not None:  # ← Valida só se vier
+        validate_api_key(api_key)
+    
     uptime = round(time.time() - start_time, 1)
     conn = sqlite3.connect("answers.db")
     cur = conn.cursor()
@@ -219,4 +222,5 @@ async def status():
         "total_answers": total,
         "uptime_seconds": uptime
     }
+
 
