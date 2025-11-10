@@ -7,6 +7,7 @@ from rapidfuzz import fuzz, process
 from unidecode import unidecode
 import time
 from datetime import datetime
+from fastapi.responses import JSONResponse
 
 app = FastAPI(title="Auto Answer API")
 
@@ -226,7 +227,9 @@ async def status(api_key: str = Query(None)):  # ← ADICIONE = None
 # 10. Helth Check (rapidapi is weird)
 # ======================
 @app.get("/health")
-async def health():
-    return {"status": "up"}
+@app.head("/health")
+async def health_check(request: Request):
+    return JSONResponse({"status": "up"})
+
 
 
